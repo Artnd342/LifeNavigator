@@ -1,0 +1,28 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Backend for LifeNavigator",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "generate": "npx prisma generate",
+    "migrate": "npx prisma migrate dev",
+    "prisma": "npx prisma"
+  },
+  "keywords": [],
+  "author": "Arpit Jyoti Anand",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "prisma": "^6.9.0"
+  }
+}
