@@ -1,100 +1,98 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import axios from 'axios';
 
-type Task = {
-  id: number;
-  title: string;
-  estimated_time: number;
-  completed: boolean;
-};
+const API = 'http://localhost:5000';
 
-const App = () => {
+const App: React.FC = () => {
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+
+  const handleLogin = (newToken: string) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+  };
+
   return (
     <Router>
-      <div className="min-h-screen p-6 bg-gray-50 text-gray-900">
-        <header className="mb-6">
-          <nav className="space-x-6 text-lg font-medium">
-            <Link to="/" className="text-blue-600 hover:underline">Home</Link>
-            <Link to="/tasks" className="text-blue-600 hover:underline">Tasks</Link>
-            <Link to="/ai-suggest" className="text-blue-600 hover:underline">AI Suggestions</Link>
-          </nav>
-        </header>
-
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/ai-suggest" element={<AISuggestions />} />
-          </Routes>
-        </main>
-      </div>
+      <Routes>
+        <Route path="/" element={token ? <Dashboard token={token} onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
     </Router>
   );
 };
 
-// ✅ Home page inline
-const Home = () => (
-  <div className="mt-8">
-    <h1 className="text-2xl font-bold">Welcome to LifeNavigator</h1>
-    <p className="mt-2 text-gray-600">Your intelligent task and life organizer.</p>
-  </div>
-);
+// 🔐 Login Component
+const Login: React.FC<{ onLogin: (token: string) => void }> = ({ onLogin }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-// ✅ Tasks page inline (Placeholder for now)
-const Tasks = () => (
-  <div className="mt-8">
-    <h1 className="text-2xl font-bold">Tasks</h1>
-    <p className="mt-2 text-gray-600">This is where your task list will go.</p>
-  </div>
-);
-
-// ✅ AI Suggestions page inline
-const AISuggestions = () => {
-  const [suggestedTasks, setSuggestedTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      try {
-        const response = await fetch('/api/ai/suggest');
-        const data = await response.json();
-        setSuggestedTasks(data);
-      } catch (error) {
-        console.error('Error fetching AI suggestions:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSuggestions();
-  }, []);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${API}/api/login`, { username, password });
+      onLogin(res.data.token);
+    } catch {
+      alert('Login failed');
+    }
+  };
 
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-4">AI-Suggested Task Order</h2>
-      {loading ? (
-        <p className="text-gray-500">Loading suggestions...</p>
-      ) : suggestedTasks.length === 0 ? (
-        <p className="text-gray-500">No suggestions available.</p>
-      ) : (
-        <ul className="space-y-2">
-          {suggestedTasks.map((task) => (
-            <li
-              key={task.id}
-              className="p-4 bg-white shadow rounded-md border border-gray-200"
-            >
-              <div className="font-semibold">{task.title}</div>
-              <div className="text-sm text-gray-500">Estimated Time: {task.estimated_time} mins</div>
-              <div className="text-sm text-gray-500">Status: {task.completed ? 'Completed' : 'Pending'}</div>
-            </li>
-          ))}
-        </ul>
-      )}
+    <form onSubmit={handleSubmit}>
+      <h2>Login</h2>
+      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <button type="submit">Login</button>
+    </form>
+  );
+};
+
+// 📝 Register Component
+const Register: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/api/register`, { username, password });
+      alert('Registered! Now login');
+    } catch {
+      alert('Registration failed');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Register</h2>
+      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
+      <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <button type="submit">Register</button>
+    </form>
+  );
+};
+
+// ✅ Dashboard Placeholder (recommend moving full Dashboard.tsx here if avoiding directories)
+const Dashboard: React.FC<{ token: string; onLogout: () => void }> = ({ token, onLogout }) => {
+  return (
+    <div>
+      <h2>Dashboard</h2>
+      <button onClick={onLogout}>Logout</button>
+      {/* You can place the complete Dashboard.tsx logic here inline if avoiding directories */}
     </div>
   );
 };
 
 export default App;
+
+
+
 
 
 

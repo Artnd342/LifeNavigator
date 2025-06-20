@@ -1,40 +1,32 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
-interface AddTaskProps {
-  onAdd: (title: string, estimated_time: number) => void;
+interface Props {
+  token: string;
+  onAdd: () => void;
 }
 
-const AddTask: React.FC<AddTaskProps> = ({ onAdd }) => {
+const AddTask: React.FC<Props> = ({ token, onAdd }) => {
   const [title, setTitle] = useState('');
-  const [estimatedTime, setEstimatedTime] = useState('');
+  const [estimated, setEstimated] = useState(0);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onAdd(title, parseInt(estimatedTime));
+  const handleAdd = async () => {
+    await axios.post('http://localhost:5000/api/tasks', {
+      title,
+      estimated_time: estimated
+    }, { headers: { Authorization: `Bearer ${token}` } });
+
     setTitle('');
-    setEstimatedTime('');
+    setEstimated(0);
+    onAdd();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 space-y-2">
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Task title"
-        className="border p-2 rounded w-full"
-      />
-      <input
-        type="number"
-        value={estimatedTime}
-        onChange={(e) => setEstimatedTime(e.target.value)}
-        placeholder="Estimated time (min)"
-        className="border p-2 rounded w-full"
-      />
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">
-        Add Task
-      </button>
-    </form>
+    <div className="space-y-2">
+      <input placeholder="Task title" className="border p-2 w-full" value={title} onChange={(e) => setTitle(e.target.value)} />
+      <input type="number" placeholder="Estimated time" className="border p-2 w-full" value={estimated} onChange={(e) => setEstimated(Number(e.target.value))} />
+      <button className="bg-purple-600 text-white px-4 py-2 rounded" onClick={handleAdd}>Add Task</button>
+    </div>
   );
 };
 

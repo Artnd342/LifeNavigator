@@ -1,28 +1,29 @@
 {
-  "name": "server",
+  "name": "lifenavigator-backend",
   "version": "1.0.0",
-  "description": "Backend for LifeNavigator",
-  "main": "index.js",
+  "main": "index.ts",
+  "license": "MIT",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js",
-    "generate": "npx prisma generate",
-    "migrate": "npx prisma migrate dev",
-    "prisma": "npx prisma"
+    "dev": "ts-node index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev"
   },
-  "keywords": [],
-  "author": "Arpit Jyoti Anand",
-  "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2",
-    "pg": "^8.11.1"
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2",
-    "prisma": "^6.9.0"
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "prisma": "^6.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }
